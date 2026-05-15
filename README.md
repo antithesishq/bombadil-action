@@ -147,7 +147,7 @@ Pair with `actions/upload-artifact` to keep the trace for inspection:
     output-path: bombadil-output
     time-limit: 5m
 - if: always()
-  uses: actions/upload-artifact@v4
+  uses: actions/upload-artifact@v7
   with:
     name: bombadil-output
     path: bombadil-output
@@ -169,7 +169,7 @@ The usual pattern: start your app in the background, wait for it to accept conne
     time-limit: 5m
     output-path: bombadil-output
 - if: always()
-  uses: actions/upload-artifact@v4
+  uses: actions/upload-artifact@v7
   with:
     name: bombadil-output
     path: bombadil-output
