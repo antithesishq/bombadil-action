@@ -152,7 +152,10 @@ async function run(): Promise<void> {
     positionals.push(...splitCommand(command));
   }
 
-  const env: NodeJS.ProcessEnv = { ...process.env };
+  const env: Record<string, string> = {};
+  for (const [key, value] of Object.entries(process.env)) {
+    if (value !== undefined) env[key] = value;
+  }
   if (driver === 'browser' && !env.CHROME) {
     const chromeVersion = core.getInput('chrome-version') || 'stable';
     const useCache = parseBool(core.getInput('cache'), 'cache');
