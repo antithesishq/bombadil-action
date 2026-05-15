@@ -41,7 +41,7 @@ inputs:
     required: false
     default: 'false'
   time-limit:
-    description: 'Maximum time to run the test, e.g. `30s`, `5m`, `2h`, `1d`. Required for the browser driver unless `reproduce` is set. Should be shorter than the job''s `timeout-minutes` so bombadil can exit cleanly and emit its trace.'
+    description: 'Maximum time to run the test, e.g. `30s`, `5m`, `2h`, `1d`. Required for the browser driver. Should be shorter than the job''s `timeout-minutes` so bombadil can exit cleanly and emit its trace.'
     required: false
   width:
     description: 'Browser viewport width in pixels.'
@@ -60,9 +60,6 @@ inputs:
     required: false
   headers:
     description: 'Extra HTTP headers to send with all browser requests. One `Key: Value` per line.'
-    required: false
-  reproduce:
-    description: 'Reproduce a previous test run from a trace file. Mutually exclusive with `time-limit` and `exit-on-violation`.'
     required: false
   headless:
     description: 'Run the browser headless (no visible window).'

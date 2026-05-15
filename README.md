@@ -67,14 +67,13 @@ Chrome is only installed when `driver: browser`.
 | `origin`                     | Starting URL (also the navigation boundary). **Required.**                                 |          |
 | `spec`                       | Path to a TS/JS specification file.                                                        |          |
 | `output-path`                | Where to store trace, screenshots, etc.                                                    |          |
-| `time-limit`                 | Maximum run time. Accepts `30s`, `5m`, `2h`, `1d`. **Required** unless `reproduce` is set. |          |
+| `time-limit`                 | Maximum run time. Accepts `30s`, `5m`, `2h`, `1d`. **Required.**                           |          |
 | `exit-on-violation`          | Exit on the first failing property.                                                        | `false`  |
 | `width` / `height`           | Viewport size in pixels.                                                                   | `1024` / `768` |
 | `device-scale-factor`        | Viewport scaling factor.                                                                   | `2`      |
 | `instrument-javascript`      | Comma-separated: `files`, `inline`.                                                        | `files,inline` |
 | `chrome-grant-permissions`   | Comma-separated Chrome permissions.                                                        | (see manual) |
 | `headers`                    | HTTP headers as multi-line `Key: Value`. See below.                                        |          |
-| `reproduce`                  | Path to a trace file to reproduce. Mutually exclusive with `time-limit` / `exit-on-violation`. |       |
 | `headless`                   | Run Chrome headless.                                                                       | `true`   |
 | `no-sandbox`                 | Disable Chromium sandboxing. Defaults on because GitHub-hosted Ubuntu runners restrict the namespaces Chromium needs. | `true`  |
 | `chrome-version`             | Channel (`stable`, `beta`, `dev`, `canary`) or specific build ID.                          | `stable` |
