@@ -27,6 +27,7 @@ jobs:
     name: Smoke test (browser driver, Wikipedia)
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -48,6 +49,7 @@ jobs:
     name: Smoke test (terminal driver, head)
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4

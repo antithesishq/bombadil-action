@@ -76,7 +76,9 @@ async function ensureChrome(version: string, useCache: boolean): Promise<string>
     }
   }
 
-  core.info(`Resolving Chrome for Testing (${platform}, build ${buildId}) in ${cacheDir}`);
+  if (!restored) {
+    core.info(`Installing Chrome for Testing (${platform}, build ${buildId}) in ${cacheDir}`);
+  }
   const installed = await install({ browser: Browser.CHROME, buildId, cacheDir });
 
   if (cacheEnabled && !restored) {
@@ -128,7 +130,7 @@ async function run(): Promise<void> {
     pushFlag(flags, '--instrument-javascript', core.getInput('instrument-javascript'));
     pushFlag(flags, '--chrome-grant-permissions', core.getInput('chrome-grant-permissions'));
     pushHeaders(flags, core.getInput('headers'));
-    pushBoolFlag(flags, '--headless', core.getInput('headless'), 'headless');
+    flags.push('--headless');
     pushBoolFlag(flags, '--no-sandbox', core.getInput('no-sandbox'), 'no-sandbox');
   } else {
     pushFlag(flags, '--test-count', core.getInput('test-count'));

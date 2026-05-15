@@ -61,10 +61,6 @@ inputs:
   headers:
     description: 'Extra HTTP headers to send with all browser requests. One `Key: Value` per line.'
     required: false
-  headless:
-    description: 'Run the browser headless (no visible window).'
-    required: false
-    default: 'true'
   no-sandbox:
     description: 'Disable Chromium sandboxing. Defaults to `true` because GitHub-hosted Ubuntu runners restrict unprivileged user namespaces, which Chromium needs to set up its sandbox. Set to `false` on hosts with a working sandbox.'
     required: false

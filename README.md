@@ -74,7 +74,6 @@ Chrome is only installed when `driver: browser`.
 | `instrument-javascript`      | Comma-separated: `files`, `inline`.                                                        | `files,inline` |
 | `chrome-grant-permissions`   | Comma-separated Chrome permissions.                                                        | (see manual) |
 | `headers`                    | HTTP headers as multi-line `Key: Value`. See below.                                        |          |
-| `headless`                   | Run Chrome headless.                                                                       | `true`   |
 | `no-sandbox`                 | Disable Chromium sandboxing. Defaults on because GitHub-hosted Ubuntu runners restrict the namespaces Chromium needs. | `true`  |
 | `chrome-version`             | Channel (`stable`, `beta`, `dev`, `canary`) or specific build ID.                          | `stable` |
 | `cache`                      | Cache the Chrome download across runs.                                                     | `true`   |
