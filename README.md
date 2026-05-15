@@ -8,7 +8,7 @@ A GitHub Action for running [Bombadil](https://github.com/antithesishq/bombadil)
 - uses: antithesishq/bombadil-action@v1
   with:
     origin: https://your-app.example.com
-    spec: ./spec/bombadil.ts
+    specification: ./bombadil/specification.ts
     time-limit: 5m
     exit-on-violation: true
     output-path: bombadil-output
@@ -33,7 +33,7 @@ Chrome is only installed when `driver: browser`.
 - uses: antithesishq/bombadil-action@v1
   with:
     origin: https://your-app.example.com
-    spec: ./spec/bombadil.ts
+    specification: ./bombadil/specification.ts
     time-limit: 10m
     headers: |
       Authorization: Bearer ${{ secrets.STAGING_TOKEN }}
@@ -65,9 +65,9 @@ Chrome is only installed when `driver: browser`.
 | Name                         | Description                                                                                | Default  |
 | ---------------------------- | ------------------------------------------------------------------------------------------ | -------- |
 | `origin`                     | Starting URL (also the navigation boundary). **Required.**                                 |          |
-| `spec`                       | Path to a TS/JS specification file.                                                        |          |
-| `output-path`                | Where to store trace, screenshots, etc.                                                    |          |
+| `specification`              | Path to a TS/JS specification file describing the properties to test.                      |          |
 | `time-limit`                 | Maximum run time. Accepts `30s`, `5m`, `2h`, `1d`. **Required.**                           |          |
+| `output-path`                | Where to store trace, screenshots, etc.                                                    |          |
 | `exit-on-violation`          | Exit on the first failing property.                                                        | `false`  |
 | `width` / `height`           | Viewport size in pixels.                                                                   | `1024` / `768` |
 | `device-scale-factor`        | Viewport scaling factor.                                                                   | `2`      |
@@ -204,7 +204,7 @@ Reproduction is a local workflow. When a test fails, bombadil prints both the `b
 
 3. Use `bombadil inspect ./bombadil-output` to step through what happened.
 
-For reproductions to succeed, run with the same options as the original (viewport, spec file, etc.).
+For reproductions to succeed, run with the same options as the original (viewport, specification file, etc.).
 
 ## Development
 

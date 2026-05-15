@@ -109,7 +109,7 @@ function splitCommand(raw: string): string[] {
 async function run(): Promise<void> {
   const driver = parseDriver(core.getInput('driver'));
   const origin = core.getInput('origin');
-  const spec = core.getInput('spec');
+  const specification = core.getInput('specification');
   const version = core.getInput('version') || 'latest';
 
   const flags: string[] = [];
@@ -150,7 +150,7 @@ async function run(): Promise<void> {
       throw new Error('The `origin` input is required when driver is "browser".');
     }
     positionals.push(origin.trim());
-    if (spec.trim() !== '') positionals.push(spec.trim());
+    if (specification.trim() !== '') positionals.push(specification.trim());
   } else {
     const command = core.getInput('command');
     if (command.trim() === '') {

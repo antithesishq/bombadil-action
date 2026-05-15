@@ -9,7 +9,7 @@ inputs:
   origin:
     description: 'Starting URL of the test (also used as a navigation boundary). Required when driver is `browser`.'
     required: false
-  spec:
+  specification:
     description: 'Path to a custom specification file (TypeScript or JavaScript).'
     required: false
   driver:
