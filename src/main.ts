@@ -113,9 +113,16 @@ async function run(): Promise<void> {
   const flags: string[] = [];
 
   if (driver === 'browser') {
+    const timeLimit = core.getInput('time-limit');
+    const reproduce = core.getInput('reproduce');
+    if (timeLimit.trim() === '' && reproduce.trim() === '') {
+      throw new Error(
+        'The `time-limit` input is required for the browser driver (e.g. `30s`, `5m`, `2h`). Without it the test runs until the job timeout, even when `exit-on-violation` is true.',
+      );
+    }
     pushFlag(flags, '--output-path', core.getInput('output-path'));
-    pushFlag(flags, '--time-limit', core.getInput('time-limit'));
-    pushFlag(flags, '--reproduce', core.getInput('reproduce'));
+    pushFlag(flags, '--time-limit', timeLimit);
+    pushFlag(flags, '--reproduce', reproduce);
     pushBoolFlag(flags, '--exit-on-violation', core.getInput('exit-on-violation'), 'exit-on-violation');
     pushFlag(flags, '--width', core.getInput('width'));
     pushFlag(flags, '--height', core.getInput('height'));

@@ -67,7 +67,7 @@ Chrome is only installed when `driver: browser`.
 | `origin`                     | Starting URL (also the navigation boundary). **Required.**                                 |          |
 | `spec`                       | Path to a TS/JS specification file.                                                        |          |
 | `output-path`                | Where to store trace, screenshots, etc.                                                    |          |
-| `time-limit`                 | Maximum run time. Accepts `30s`, `5m`, `2h`, `1d`.                                         |          |
+| `time-limit`                 | Maximum run time. Accepts `30s`, `5m`, `2h`, `1d`. **Required** unless `reproduce` is set. |          |
 | `exit-on-violation`          | Exit on the first failing property.                                                        | `false`  |
 | `width` / `height`           | Viewport size in pixels.                                                                   | `1024` / `768` |
 | `device-scale-factor`        | Viewport scaling factor.                                                                   | `2`      |
@@ -108,6 +108,21 @@ with:
 ```
 
 Each line becomes a separate `--header KEY=VALUE` on the CLI.
+
+## Time limit
+
+The browser driver requires `time-limit` — without it a test can run until the job times out, even with `exit-on-violation: true` (if no violation fires, there's nothing to exit on). Set it shorter than the surrounding job's [`timeout-minutes`](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idtimeout-minutes) so bombadil can exit cleanly and write its trace before the runner is killed.
+
+```yaml
+jobs:
+  test:
+    timeout-minutes: 10
+    steps:
+      - uses: antithesishq/bombadil-action@v1
+        with:
+          origin: https://your-app.example.com
+          time-limit: 5m
+```
 
 ## Chrome installation
 
@@ -200,4 +215,15 @@ npm install
 npm run build   # bundles src/main.ts → dist/index.js with @vercel/ncc
 ```
 
-Commit `dist/` along with source changes — that's what GitHub runs.
+CI rebuilds `dist/` and commits it back to `main` after the smoke tests pass, so you don't need to commit `dist/` from a PR yourself.
+
+## Releasing
+
+Releases are just floating major-version tags. Consumers reference `@v1`, `@v2`, etc.
+
+```sh
+git tag -f v1
+git push origin v1 --force
+```
+
+For a new major (breaking change), use a fresh tag (`v2`) so existing consumers stay pinned to `v1`. Anyone needing an immutable pin can use a commit SHA: `uses: antithesishq/bombadil-action@<sha>`.
