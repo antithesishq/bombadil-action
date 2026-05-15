@@ -76,7 +76,7 @@ Chrome is only installed when `driver: browser`.
 | `headers`                    | HTTP headers as multi-line `Key: Value`. See below.                                        |          |
 | `reproduce`                  | Path to a trace file to reproduce. Mutually exclusive with `time-limit` / `exit-on-violation`. |       |
 | `headless`                   | Run Chrome headless.                                                                       | `true`   |
-| `no-sandbox`                 | Disable Chromium sandboxing.                                                               | `false`  |
+| `no-sandbox`                 | Disable Chromium sandboxing. Defaults on because GitHub-hosted Ubuntu runners restrict the namespaces Chromium needs. | `true`  |
 | `chrome-version`             | Channel (`stable`, `beta`, `dev`, `canary`) or specific build ID.                          | `stable` |
 | `cache`                      | Cache the Chrome download across runs.                                                     | `true`   |
 
