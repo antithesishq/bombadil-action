@@ -1,0 +1,23 @@
+{
+  "name": "bombadil-action",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GitHub Action for running Bombadil property-based browser tests",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build src/main.ts -o dist --source-map --license licenses.txt",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@actions/cache": "^3.2.4",
+    "@actions/core": "^1.11.1",
+    "@actions/exec": "^1.1.1",
+    "@puppeteer/browsers": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@vercel/ncc": "^0.38.1",
+    "typescript": "^5.5.0"
+  }
+}

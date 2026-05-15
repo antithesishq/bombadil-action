@@ -1,0 +1,94 @@
+name: 'Bombadil'
+description: 'Run property-based browser tests with Bombadil'
+author: 'Antithesis'
+branding:
+  icon: 'shield'
+  color: 'purple'
+
+inputs:
+  origin:
+    description: 'Starting URL of the test (also used as a navigation boundary). Required when driver is `browser`.'
+    required: false
+  spec:
+    description: 'Path to a custom specification file (TypeScript or JavaScript).'
+    required: false
+  driver:
+    description: 'Which Bombadil driver to use: `browser` or `terminal`.'
+    required: false
+    default: 'browser'
+  command:
+    description: 'Command to run, for terminal driver (program and arguments, space-separated).'
+    required: false
+
+  version:
+    description: 'Version of @antithesishq/bombadil to use. Defaults to latest.'
+    required: false
+    default: 'latest'
+  chrome-version:
+    description: 'Chrome for Testing version to install for the browser driver. Accepts a channel (`stable`, `beta`, `dev`, `canary`) or a specific build ID. Ignored when driver is `terminal`, or when the `CHROME` env var is already set.'
+    required: false
+    default: 'stable'
+  cache:
+    description: 'Cache the Chrome download across runs (keyed on platform + resolved build ID). Set to `false` to disable.'
+    required: false
+    default: 'true'
+
+  output-path:
+    description: 'Where to store output data (trace, screenshots, etc.).'
+    required: false
+  exit-on-violation:
+    description: 'Exit the test when the first failing property is found.'
+    required: false
+    default: 'false'
+  time-limit:
+    description: 'Maximum time to run the test, e.g. `30s`, `5m`, `2h`, `1d`.'
+    required: false
+  width:
+    description: 'Browser viewport width in pixels.'
+    required: false
+  height:
+    description: 'Browser viewport height in pixels.'
+    required: false
+  device-scale-factor:
+    description: 'Scaling factor of the browser viewport.'
+    required: false
+  instrument-javascript:
+    description: 'Comma-separated list of JS types to instrument: `files`, `inline`.'
+    required: false
+  chrome-grant-permissions:
+    description: 'Comma-separated list of Chrome permissions to grant.'
+    required: false
+  headers:
+    description: 'Extra HTTP headers to send with all browser requests. One `Key: Value` per line.'
+    required: false
+  reproduce:
+    description: 'Reproduce a previous test run from a trace file. Mutually exclusive with `time-limit` and `exit-on-violation`.'
+    required: false
+  headless:
+    description: 'Run the browser headless (no visible window).'
+    required: false
+    default: 'true'
+  no-sandbox:
+    description: 'Disable Chromium sandboxing.'
+    required: false
+    default: 'false'
+
+  # Terminal-driver options
+  test-count:
+    description: 'How many test cases to run (terminal driver).'
+    required: false
+  seed:
+    description: 'Random generator seed (terminal driver).'
+    required: false
+  render-append:
+    description: 'Append render output instead of clearing the screen between renders (terminal driver).'
+    required: false
+    default: 'false'
+
+outputs:
+  exit-code:
+    description: 'The exit code from the bombadil process (0 = ok, 2 = violations).'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
