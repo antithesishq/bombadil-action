@@ -21,9 +21,9 @@ inputs:
     required: false
 
   version:
-    description: 'Version of @antithesishq/bombadil to use. Defaults to latest.'
+    description: 'Version of @antithesishq/bombadil to use. Defaults to 0.5.0.'
     required: false
-    default: 'latest'
+    default: '0.5.0'
   chrome-version:
     description: 'Chrome for Testing version to install for the browser driver. Accepts a channel (`stable`, `beta`, `dev`, `canary`) or a specific build ID. Ignored when driver is `terminal`, or when the `CHROME` env var is already set.'
     required: false
