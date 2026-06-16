@@ -60,6 +60,7 @@ jobs:
         with:
           driver: terminal
           command: head -n 50
+          time-limit: 10s
 
   publish-dist:
     name: Publish dist to main
