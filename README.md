@@ -58,7 +58,7 @@ Chrome is only installed when `driver: browser`.
 | Name                | Description                                                                                                 | Default   |
 | ------------------- | ----------------------------------------------------------------------------------------------------------- | --------- |
 | `driver`            | `browser` or `terminal`.                                                                                    | `browser` |
-| `version`           | Version of `@antithesishq/bombadil` to use.                                                                 | `0.5.0`   |
+| `version`           | Version of `@antithesishq/bombadil` to use.                                                                 | `0.6.0`   |
 | `specification`     | Path to a TS/JS specification file describing the properties to test.                                       |           |
 | `time-limit`        | Maximum run time. Accepts `30s`, `5m`, `2h`, `1d`. **Required.**                                            |           |
 | `output-path`       | Where to store trace, screenshots, etc.                                                                     |           |
