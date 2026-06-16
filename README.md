@@ -5,7 +5,7 @@ A GitHub Action for running [Bombadil](https://github.com/antithesishq/bombadil)
 ## Quick start
 
 ```yaml
-- uses: antithesishq/bombadil-action@v1
+- uses: antithesishq/bombadil-action@v2
   with:
     origin: https://your-app.example.com
     specification: ./bombadil/specification.ts
@@ -30,7 +30,7 @@ Chrome is only installed when `driver: browser`.
 ### Browser driver
 
 ```yaml
-- uses: antithesishq/bombadil-action@v1
+- uses: antithesishq/bombadil-action@v2
   with:
     origin: https://your-app.example.com
     specification: ./bombadil/specification.ts
@@ -43,7 +43,7 @@ Chrome is only installed when `driver: browser`.
 ### Terminal driver
 
 ```yaml
-- uses: antithesishq/bombadil-action@v1
+- uses: antithesishq/bombadil-action@v2
   with:
     driver: terminal
     command: ./my-program --flag
@@ -117,7 +117,7 @@ jobs:
   test:
     timeout-minutes: 10
     steps:
-      - uses: antithesishq/bombadil-action@v1
+      - uses: antithesishq/bombadil-action@v2
         with:
           origin: https://your-app.example.com
           time-limit: 5m
@@ -128,7 +128,7 @@ jobs:
 When `driver: browser`, the action installs Chrome for Testing via [`@puppeteer/browsers`](https://www.npmjs.com/package/@puppeteer/browsers) into `$RUNNER_TEMP/bombadil-chrome` and exports `CHROME=<path>` so `bombadil` picks it up. To use a pre-installed Chrome instead, set `CHROME` in the workflow env — the action will skip the download:
 
 ```yaml
-- uses: antithesishq/bombadil-action@v1
+- uses: antithesishq/bombadil-action@v2
   env:
     CHROME: /usr/bin/google-chrome
   with:
@@ -142,7 +142,7 @@ By default the download is cached per `(platform, build ID)`. Disable with `cach
 Pair with `actions/upload-artifact` to keep the trace for inspection:
 
 ```yaml
-- uses: antithesishq/bombadil-action@v1
+- uses: antithesishq/bombadil-action@v2
   with:
     origin: https://your-app.example.com
     output-path: bombadil-output
@@ -164,7 +164,7 @@ The usual pattern: start your app in the background, wait for it to accept conne
 - run: npm ci
 - run: npm run start &
 - run: curl --retry 30 --retry-all-errors --retry-delay 2 --silent --fail http://localhost:3000 >/dev/null
-- uses: antithesishq/bombadil-action@v1
+- uses: antithesishq/bombadil-action@v2
   with:
     origin: http://localhost:3000
     time-limit: 5m
@@ -182,7 +182,7 @@ For Docker-based stacks:
 
 ```yaml
 - run: docker compose up --detach --wait
-- uses: antithesishq/bombadil-action@v1
+- uses: antithesishq/bombadil-action@v2
   with:
     origin: http://localhost:8080
     time-limit: 5m
@@ -225,4 +225,4 @@ git tag -f v1
 git push origin v1 --force
 ```
 
-For a new major (breaking change), use a fresh tag (`v2`) so existing consumers stay pinned to `v1`. Anyone needing an immutable pin can use a commit SHA: `uses: antithesishq/bombadil-action@<sha>`.
+For a new breaking change, use a fresh tag so existing consumers stay pinned. Anyone needing an immutable pin can use a commit SHA: `uses: antithesishq/bombadil-action@<sha>`.
