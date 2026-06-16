@@ -14,16 +14,16 @@ A GitHub Action for running [Bombadil](https://github.com/antithesishq/bombadil)
     output-path: bombadil-output
 ```
 
-That installs Chrome for Testing, runs `bombadil test`, and fails the job on a property violation. The Chrome download is cached across runs.
+That installs Chrome for Testing, runs `bombadil browser test`, and fails the job on a property violation. The Chrome download is cached across runs.
 
 ## Drivers
 
 Bombadil has two drivers. Select with `driver`:
 
-| `driver`   | Subcommand                | What it does                                    |
-| ---------- | ------------------------- | ----------------------------------------------- |
-| `browser` (default) | `bombadil test`           | Drives a real Chrome browser against `origin`.  |
-| `terminal` | `bombadil terminal test`  | Runs a command and tests its terminal output.   |
+| `driver`            | Subcommand               | What it does                                   |
+| ------------------- | ------------------------ | ---------------------------------------------- |
+| `browser` (default) | `bombadil browser test`  | Drives a real Chrome browser against `origin`. |
+| `terminal`          | `bombadil terminal test` | Runs a command and tests its terminal output.  |
 
 Chrome is only installed when `driver: browser`.
 
@@ -47,45 +47,46 @@ Chrome is only installed when `driver: browser`.
   with:
     driver: terminal
     command: ./my-program --flag
-    test-count: 100
-    seed: 42
+    specification: ./bombadil/terminal-specification.ts
+    time-limit: 5m
 ```
 
 ## Inputs
 
 ### Common
 
-| Name      | Description                                                            | Default    |
-| --------- | ---------------------------------------------------------------------- | ---------- |
-| `driver`  | `browser` or `terminal`.                                               | `browser`  |
-| `version` | Version of `@antithesishq/bombadil` to use.                            | `latest`   |
+| Name                | Description                                                                                                 | Default   |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- | --------- |
+| `driver`            | `browser` or `terminal`.                                                                                    | `browser` |
+| `version`           | Version of `@antithesishq/bombadil` to use.                                                                 | `0.5.0`   |
+| `specification`     | Path to a TS/JS specification file describing the properties to test.                                       |           |
+| `time-limit`        | Maximum run time. Accepts `30s`, `5m`, `2h`, `1d`. **Required.**                                            |           |
+| `output-path`       | Where to store trace, screenshots, etc.                                                                     |           |
+| `exit-on-violation` | Exit on the first failing property.                                                                         | `false`   |
 
 ### Browser driver
 
-| Name                         | Description                                                                                | Default  |
-| ---------------------------- | ------------------------------------------------------------------------------------------ | -------- |
-| `origin`                     | Starting URL (also the navigation boundary). **Required.**                                 |          |
-| `specification`              | Path to a TS/JS specification file describing the properties to test.                      |          |
-| `time-limit`                 | Maximum run time. Accepts `30s`, `5m`, `2h`, `1d`. **Required.**                           |          |
-| `output-path`                | Where to store trace, screenshots, etc.                                                    |          |
-| `exit-on-violation`          | Exit on the first failing property.                                                        | `false`  |
-| `width` / `height`           | Viewport size in pixels.                                                                   | `1024` / `768` |
-| `device-scale-factor`        | Viewport scaling factor.                                                                   | `2`      |
-| `instrument-javascript`      | Comma-separated: `files`, `inline`.                                                        | `files,inline` |
-| `chrome-grant-permissions`   | Comma-separated Chrome permissions.                                                        | (see manual) |
-| `headers`                    | HTTP headers as multi-line `Key: Value`. See below.                                        |          |
-| `no-sandbox`                 | Disable Chromium sandboxing. Defaults on because GitHub-hosted Ubuntu runners restrict the namespaces Chromium needs. | `true`  |
-| `chrome-version`             | Channel (`stable`, `beta`, `dev`, `canary`) or specific build ID.                          | `stable` |
-| `cache`                      | Cache the Chrome download across runs.                                                     | `true`   |
+| Name                       | Description                                                                                                          | Default        |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------- |
+| `origin`                   | Starting URL (also the navigation boundary). **Required.**                                                           |                |
+| `width` / `height`         | Viewport size in pixels.                                                                                             | `1024` / `768` |
+| `device-scale-factor`      | Viewport scaling factor.                                                                                             | `2`            |
+| `instrument-javascript`    | Comma-separated: `files`, `inline`.                                                                                  | `files,inline` |
+| `chrome-grant-permissions` | Comma-separated Chrome permissions.                                                                                  | (see manual)   |
+| `headers`                  | HTTP headers as multi-line `Key: Value`. See below.                                                                  |                |
+| `no-sandbox`               | Disable Chromium sandboxing. Defaults on because GitHub-hosted Ubuntu runners restrict the namespaces Chromium needs. | `true`         |
+| `chrome-version`           | Channel (`stable`, `beta`, `dev`, `canary`) or specific build ID.                                                    | `stable`       |
+| `cache`                    | Cache the Chrome download across runs.                                                                               | `true`         |
 
 ### Terminal driver
 
-| Name             | Description                                                       | Default |
-| ---------------- | ----------------------------------------------------------------- | ------- |
-| `command`        | Program and arguments, space-separated. **Required.**             |         |
-| `test-count`     | How many test cases to run.                                       | `1`     |
-| `seed`           | Random generator seed.                                            |         |
-| `render-append`  | Append render output instead of clearing between renders.         | `false` |
+| Name                    | Description                                                                                                       | Default |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------- | ------- |
+| `command`               | Program and arguments, space-separated. **Required.**                                                             |         |
+| `columns`               | Terminal columns at startup.                                                                                      | `100`   |
+| `rows`                  | Terminal rows at startup.                                                                                         | `40`    |
+| `scrollback-lines-max`  | Maximum line count to keep in the scrollback buffer.                                                              | `100`   |
+| `output-path-overwrite` | Overwrite any existing trace at `output-path`. Without this, bombadil refuses to write when `trace.jsonl` exists. | `false` |
 
 ## Outputs
 
@@ -109,7 +110,7 @@ Each line becomes a separate `--header KEY=VALUE` on the CLI.
 
 ## Time limit
 
-The browser driver requires `time-limit` — without it a test can run until the job times out, even with `exit-on-violation: true` (if no violation fires, there's nothing to exit on). Set it shorter than the surrounding job's [`timeout-minutes`](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idtimeout-minutes) so bombadil can exit cleanly and write its trace before the runner is killed.
+`time-limit` is required — without it a test can run until the job times out, even with `exit-on-violation: true` (if no violation fires, there's nothing to exit on). Set it shorter than the surrounding job's [`timeout-minutes`](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idtimeout-minutes) so bombadil can exit cleanly and write its trace before the runner is killed.
 
 ```yaml
 jobs:
@@ -193,16 +194,16 @@ For Docker-based stacks:
 
 ## Reproducing a failure
 
-Reproduction is a local workflow. When a test fails, bombadil prints both the `bombadil inspect` and `bombadil test --reproduce ...` commands to stdout — copy them from the job log.
+Reproduction is a local workflow. When a test fails, bombadil prints both the `bombadil browser inspect` and `bombadil browser test --reproduce ...` commands to stdout — copy them from the job log.
 
 1. Download the output artifact uploaded by the failing run.
 2. Unzip it, then run the printed command locally against the same app:
 
    ```sh
-   bombadil test --reproduce=./bombadil-output https://your-app.example.com
+   bombadil browser test --reproduce=./bombadil-output https://your-app.example.com
    ```
 
-3. Use `bombadil inspect ./bombadil-output` to step through what happened.
+3. Use `bombadil browser inspect ./bombadil-output` to step through what happened.
 
 For reproductions to succeed, run with the same options as the original (viewport, specification file, etc.).
 

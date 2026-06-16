@@ -1,5 +1,5 @@
 name: 'Bombadil'
-description: 'Run property-based browser tests with Bombadil'
+description: 'Run property-based UI tests with Bombadil'
 author: 'Antithesis'
 branding:
   icon: 'shield'
@@ -21,9 +21,9 @@ inputs:
     required: false
 
   version:
-    description: 'Version of @antithesishq/bombadil to use. Defaults to latest.'
+    description: 'Version of @antithesishq/bombadil to use. Defaults to 0.5.0.'
     required: false
-    default: 'latest'
+    default: '0.5.0'
   chrome-version:
     description: 'Chrome for Testing version to install for the browser driver. Accepts a channel (`stable`, `beta`, `dev`, `canary`) or a specific build ID. Ignored when driver is `terminal`, or when the `CHROME` env var is already set.'
     required: false
@@ -41,7 +41,7 @@ inputs:
     required: false
     default: 'false'
   time-limit:
-    description: 'Maximum time to run the test, e.g. `30s`, `5m`, `2h`, `1d`. Required for the browser driver. Should be shorter than the job''s `timeout-minutes` so bombadil can exit cleanly and emit its trace.'
+    description: 'Maximum time to run the test, e.g. `30s`, `5m`, `2h`, `1d`. Required. Should be shorter than the job''s `timeout-minutes` so bombadil can exit cleanly and emit its trace.'
     required: false
   width:
     description: 'Browser viewport width in pixels.'
@@ -67,14 +67,17 @@ inputs:
     default: 'true'
 
   # Terminal-driver options
-  test-count:
-    description: 'How many test cases to run (terminal driver).'
+  columns:
+    description: 'Terminal columns at startup (terminal driver).'
     required: false
-  seed:
-    description: 'Random generator seed (terminal driver).'
+  rows:
+    description: 'Terminal rows at startup (terminal driver).'
     required: false
-  render-append:
-    description: 'Append render output instead of clearing the screen between renders (terminal driver).'
+  scrollback-lines-max:
+    description: 'Maximum line count to keep in the scrollback buffer (terminal driver).'
+    required: false
+  output-path-overwrite:
+    description: 'Overwrite any existing trace at `output-path` (terminal driver). Without this, bombadil refuses to write when `trace.jsonl` already exists.'
     required: false
     default: 'false'
 

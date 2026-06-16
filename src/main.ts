@@ -112,18 +112,19 @@ async function run(): Promise<void> {
   const specification = core.getInput('specification');
   const version = core.getInput('version') || 'latest';
 
+  const timeLimit = core.getInput('time-limit');
+  if (timeLimit.trim() === '') {
+    throw new Error(
+      'The `time-limit` input is required (e.g. `30s`, `5m`, `2h`). Without it the test runs until the job timeout, even when `exit-on-violation` is true.',
+    );
+  }
+
   const flags: string[] = [];
+  pushFlag(flags, '--output-path', core.getInput('output-path'));
+  pushFlag(flags, '--time-limit', timeLimit);
+  pushBoolFlag(flags, '--exit-on-violation', core.getInput('exit-on-violation'), 'exit-on-violation');
 
   if (driver === 'browser') {
-    const timeLimit = core.getInput('time-limit');
-    if (timeLimit.trim() === '') {
-      throw new Error(
-        'The `time-limit` input is required for the browser driver (e.g. `30s`, `5m`, `2h`). Without it the test runs until the job timeout, even when `exit-on-violation` is true.',
-      );
-    }
-    pushFlag(flags, '--output-path', core.getInput('output-path'));
-    pushFlag(flags, '--time-limit', timeLimit);
-    pushBoolFlag(flags, '--exit-on-violation', core.getInput('exit-on-violation'), 'exit-on-violation');
     pushFlag(flags, '--width', core.getInput('width'));
     pushFlag(flags, '--height', core.getInput('height'));
     pushFlag(flags, '--device-scale-factor', core.getInput('device-scale-factor'));
@@ -133,16 +134,14 @@ async function run(): Promise<void> {
     flags.push('--headless');
     pushBoolFlag(flags, '--no-sandbox', core.getInput('no-sandbox'), 'no-sandbox');
   } else {
-    pushFlag(flags, '--test-count', core.getInput('test-count'));
-    pushFlag(flags, '--seed', core.getInput('seed'));
-    pushBoolFlag(flags, '--render-append', core.getInput('render-append'), 'render-append');
+    pushFlag(flags, '--specification', specification);
+    pushFlag(flags, '--columns', core.getInput('columns'));
+    pushFlag(flags, '--rows', core.getInput('rows'));
+    pushFlag(flags, '--scrollback-lines-max', core.getInput('scrollback-lines-max'));
+    pushBoolFlag(flags, '--output-path-overwrite', core.getInput('output-path-overwrite'), 'output-path-overwrite');
   }
 
-  // Subcommand routing. Bombadil currently exposes `bombadil test` for the
-  // browser driver and `bombadil terminal test` for the terminal driver.
-  // Once the CLI unifies under `bombadil <driver> test`, this is the only
-  // place that needs to change.
-  const subcommand = driver === 'browser' ? ['test'] : ['terminal', 'test'];
+  const subcommand = [driver, 'test'];
 
   const positionals: string[] = [];
   if (driver === 'browser') {
@@ -156,7 +155,8 @@ async function run(): Promise<void> {
     if (command.trim() === '') {
       throw new Error('The `command` input is required when driver is "terminal".');
     }
-    positionals.push(...splitCommand(command));
+    // `--` so anything that looks like a flag is forwarded to the SUT.
+    positionals.push('--', ...splitCommand(command));
   }
 
   const env: Record<string, string> = {};
