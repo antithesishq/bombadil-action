@@ -36,20 +36,34 @@ function pushBoolFlag(args: string[], flag: string, raw: string, name: string) {
   if (parseBool(raw, name)) args.push(flag);
 }
 
+function contentLines(raw: string): string[] {
+  return raw
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line !== '' && !line.startsWith('#'));
+}
+
 function pushHeaders(args: string[], raw: string) {
-  for (const line of raw.split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (trimmed === '' || trimmed.startsWith('#')) continue;
-    const idx = trimmed.indexOf(':');
+  for (const line of contentLines(raw)) {
+    const idx = line.indexOf(':');
     if (idx === -1) {
-      throw new Error(`Invalid header "${trimmed}". Expected "Key: Value".`);
+      throw new Error(`Invalid header "${line}". Expected "Key: Value".`);
     }
-    const key = trimmed.slice(0, idx).trim();
-    const value = trimmed.slice(idx + 1).trim();
+    const key = line.slice(0, idx).trim();
+    const value = line.slice(idx + 1).trim();
     if (key === '') {
-      throw new Error(`Invalid header "${trimmed}". Empty key.`);
+      throw new Error(`Invalid header "${line}". Empty key.`);
     }
     args.push('--header', `${key}=${value}`);
+  }
+}
+
+function pushCookies(args: string[], raw: string) {
+  for (const line of contentLines(raw)) {
+    if (!line.includes('=')) {
+      throw new Error(`Invalid cookie "${line}". Expected "NAME=VALUE" or Set-Cookie syntax.`);
+    }
+    args.push('--cookie', line);
   }
 }
 
@@ -123,6 +137,7 @@ async function run(): Promise<void> {
   pushFlag(flags, '--output-path', core.getInput('output-path'));
   pushFlag(flags, '--time-limit', timeLimit);
   pushBoolFlag(flags, '--exit-on-violation', core.getInput('exit-on-violation'), 'exit-on-violation');
+  pushBoolFlag(flags, '--output-path-overwrite', core.getInput('output-path-overwrite'), 'output-path-overwrite');
 
   if (driver === 'browser') {
     pushFlag(flags, '--width', core.getInput('width'));
@@ -131,6 +146,7 @@ async function run(): Promise<void> {
     pushFlag(flags, '--instrument-javascript', core.getInput('instrument-javascript'));
     pushFlag(flags, '--chrome-grant-permissions', core.getInput('chrome-grant-permissions'));
     pushHeaders(flags, core.getInput('headers'));
+    pushCookies(flags, core.getInput('cookies'));
     flags.push('--headless');
     pushBoolFlag(flags, '--no-sandbox', core.getInput('no-sandbox'), 'no-sandbox');
   } else {
@@ -138,7 +154,7 @@ async function run(): Promise<void> {
     pushFlag(flags, '--columns', core.getInput('columns'));
     pushFlag(flags, '--rows', core.getInput('rows'));
     pushFlag(flags, '--scrollback-lines-max', core.getInput('scrollback-lines-max'));
-    pushBoolFlag(flags, '--output-path-overwrite', core.getInput('output-path-overwrite'), 'output-path-overwrite');
+    pushFlag(flags, '--quiescence-timeout-ms', core.getInput('quiescence-timeout-ms'));
   }
 
   const subcommand = [driver, 'test'];
