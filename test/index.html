@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Click the things</title>
+</head>
+<body>
+    <h1>Click the things</h1>
+    <button disabled>1</button>
+    <button disabled>2</button>
+    <button disabled>3</button>
+    <button disabled>4</button>
+    <button disabled>5</button>
+    <button disabled>6</button>
+    <div id="message"></div>
+
+    <script>
+      const buttons = [...document.querySelectorAll("button")];
+      const message = document.querySelector("#message");
+
+      buttons.forEach(b => { 
+        b.disabled = false; 
+        b.addEventListener("click", () => {
+          message.textContent = "You clicked button #" + b.textContent;
+        });
+      });
+    </script>
+</body>
+</html>

@@ -24,7 +24,7 @@ jobs:
           path: dist
 
   smoke-test-browser:
-    name: Smoke test (browser driver, Wikipedia)
+    name: Smoke test (browser driver)
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -36,9 +36,10 @@ jobs:
           path: dist
       - uses: ./
         with:
-          origin: https://en.wikipedia.org
+          origin: test/index.html
           time-limit: 10s
           output-path: bombadil-output
+          output-path-overwrite: true
       - if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -46,7 +47,7 @@ jobs:
           path: bombadil-output
 
   smoke-test-terminal:
-    name: Smoke test (terminal driver, head)
+    name: Smoke test (terminal driver)
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -61,6 +62,14 @@ jobs:
           driver: terminal
           command: head -n 50
           time-limit: 10s
+          quiescence-timeout-ms: 10
+          output-path: bombadil-output
+          output-path-overwrite: true
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bombadil-output-terminal
+          path: bombadil-output
 
   publish-dist:
     name: Publish dist to main

@@ -5,7 +5,7 @@ A GitHub Action for running [Bombadil](https://github.com/antithesishq/bombadil)
 ## Quick start
 
 ```yaml
-- uses: antithesishq/bombadil-action@v2
+- uses: antithesishq/bombadil-action@v3
   with:
     origin: https://your-app.example.com
     specification: ./bombadil/specification.ts
@@ -15,6 +15,8 @@ A GitHub Action for running [Bombadil](https://github.com/antithesishq/bombadil)
 ```
 
 That installs Chrome for Testing, runs `bombadil browser test`, and fails the job on a property violation. The Chrome download is cached across runs.
+
+`v3` runs Bombadil 0.7.x by default. If you are coming from `v2` (Bombadil 0.6.x) and have a custom specification, see [Upgrading from v2](#upgrading-from-v2).
 
 ## Drivers
 
@@ -30,7 +32,7 @@ Chrome is only installed when `driver: browser`.
 ### Browser driver
 
 ```yaml
-- uses: antithesishq/bombadil-action@v2
+- uses: antithesishq/bombadil-action@v3
   with:
     origin: https://your-app.example.com
     specification: ./bombadil/specification.ts
@@ -43,7 +45,7 @@ Chrome is only installed when `driver: browser`.
 ### Terminal driver
 
 ```yaml
-- uses: antithesishq/bombadil-action@v2
+- uses: antithesishq/bombadil-action@v3
   with:
     driver: terminal
     command: ./my-program --flag
@@ -58,11 +60,12 @@ Chrome is only installed when `driver: browser`.
 | Name                | Description                                                                                                 | Default   |
 | ------------------- | ----------------------------------------------------------------------------------------------------------- | --------- |
 | `driver`            | `browser` or `terminal`.                                                                                    | `browser` |
-| `version`           | Version of `@antithesishq/bombadil` to use.                                                                 | `0.6.0`   |
+| `version`           | Version of `@antithesishq/bombadil` to use. Requires 0.7.0 or later.                                        | `0.7.3`   |
 | `specification`     | Path to a TS/JS specification file describing the properties to test.                                       |           |
 | `time-limit`        | Maximum run time. Accepts `30s`, `5m`, `2h`, `1d`. **Required.**                                            |           |
 | `output-path`       | Where to store trace, screenshots, etc.                                                                     |           |
 | `exit-on-violation` | Exit on the first failing property.                                                                         | `false`   |
+| `output-path-overwrite` | Overwrite an existing trace at `output-path`. Without this, bombadil refuses to write when `trace.jsonl` exists. | `false`   |
 
 ### Browser driver
 
@@ -70,10 +73,11 @@ Chrome is only installed when `driver: browser`.
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------- |
 | `origin`                   | Starting URL (also the navigation boundary). **Required.**                                                           |                |
 | `width` / `height`         | Viewport size in pixels.                                                                                             | `1024` / `768` |
-| `device-scale-factor`      | Viewport scaling factor.                                                                                             | `2`            |
+| `device-scale-factor`      | Viewport scaling factor.                                                                                             | `1`            |
 | `instrument-javascript`    | Comma-separated: `files`, `inline`.                                                                                  | `files,inline` |
 | `chrome-grant-permissions` | Comma-separated Chrome permissions.                                                                                  | (see manual)   |
-| `headers`                  | HTTP headers as multi-line `Key: Value`. See below.                                                                  |                |
+| `headers`                  | HTTP headers as multi-line `Key: Value`. See [Headers](#headers).                                                    |                |
+| `cookies`                  | Cookies to set before testing, one per line. See [Cookies](#cookies).                                                |                |
 | `no-sandbox`               | Disable Chromium sandboxing. Defaults on because GitHub-hosted Ubuntu runners restrict the namespaces Chromium needs. | `true`         |
 | `chrome-version`           | Channel (`stable`, `beta`, `dev`, `canary`) or specific build ID.                                                    | `stable`       |
 | `cache`                    | Cache the Chrome download across runs.                                                                               | `true`         |
@@ -86,7 +90,7 @@ Chrome is only installed when `driver: browser`.
 | `columns`               | Terminal columns at startup.                                                                                      | `100`   |
 | `rows`                  | Terminal rows at startup.                                                                                         | `40`    |
 | `scrollback-lines-max`  | Maximum line count to keep in the scrollback buffer.                                                              | `100`   |
-| `output-path-overwrite` | Overwrite any existing trace at `output-path`. Without this, bombadil refuses to write when `trace.jsonl` exists. | `false` |
+| `quiescence-timeout-ms` | How long to wait for the program to stop emitting output before sampling the next state. Lower is faster but risks sampling mid-render. | `5`     |
 
 ## Outputs
 
@@ -108,6 +112,19 @@ with:
 
 Each line becomes a separate `--header KEY=VALUE` on the CLI.
 
+## Cookies
+
+`cookies` is a multi-line string with one cookie per line, and only applies to the browser driver. Blank lines and `#`-comments are ignored. Each line becomes a separate `--cookie` on the CLI, and unlike `headers` these become real browser cookies.
+
+A plain `NAME=VALUE` line is scoped to `origin`. Set-Cookie attributes such as `Domain`, `Path`, `Secure`, and `HttpOnly` are also supported:
+
+```yaml
+with:
+  cookies: |
+    session=${{ secrets.SESSION_COOKIE }}
+    feature_flag=on; Path=/; Secure
+```
+
 ## Time limit
 
 `time-limit` is required — without it a test can run until the job times out, even with `exit-on-violation: true` (if no violation fires, there's nothing to exit on). Set it shorter than the surrounding job's [`timeout-minutes`](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idtimeout-minutes) so bombadil can exit cleanly and write its trace before the runner is killed.
@@ -117,7 +134,7 @@ jobs:
   test:
     timeout-minutes: 10
     steps:
-      - uses: antithesishq/bombadil-action@v2
+      - uses: antithesishq/bombadil-action@v3
         with:
           origin: https://your-app.example.com
           time-limit: 5m
@@ -128,7 +145,7 @@ jobs:
 When `driver: browser`, the action installs Chrome for Testing via [`@puppeteer/browsers`](https://www.npmjs.com/package/@puppeteer/browsers) into `$RUNNER_TEMP/bombadil-chrome` and exports `CHROME=<path>` so `bombadil` picks it up. To use a pre-installed Chrome instead, set `CHROME` in the workflow env — the action will skip the download:
 
 ```yaml
-- uses: antithesishq/bombadil-action@v2
+- uses: antithesishq/bombadil-action@v3
   env:
     CHROME: /usr/bin/google-chrome
   with:
@@ -142,7 +159,7 @@ By default the download is cached per `(platform, build ID)`. Disable with `cach
 Pair with `actions/upload-artifact` to keep the trace for inspection:
 
 ```yaml
-- uses: antithesishq/bombadil-action@v2
+- uses: antithesishq/bombadil-action@v3
   with:
     origin: https://your-app.example.com
     output-path: bombadil-output
@@ -154,7 +171,7 @@ Pair with `actions/upload-artifact` to keep the trace for inspection:
     path: bombadil-output
 ```
 
-You can then download the artifact and run `bombadil inspect bombadil-output` locally to step through what happened.
+You can then download the artifact and run `bombadil browser inspect bombadil-output` locally to step through what happened.
 
 ## Testing against a local server
 
@@ -164,7 +181,7 @@ The usual pattern: start your app in the background, wait for it to accept conne
 - run: npm ci
 - run: npm run start &
 - run: curl --retry 30 --retry-all-errors --retry-delay 2 --silent --fail http://localhost:3000 >/dev/null
-- uses: antithesishq/bombadil-action@v2
+- uses: antithesishq/bombadil-action@v3
   with:
     origin: http://localhost:3000
     time-limit: 5m
@@ -182,7 +199,7 @@ For Docker-based stacks:
 
 ```yaml
 - run: docker compose up --detach --wait
-- uses: antithesishq/bombadil-action@v2
+- uses: antithesishq/bombadil-action@v3
   with:
     origin: http://localhost:8080
     time-limit: 5m
@@ -206,6 +223,15 @@ Reproduction is a local workflow. When a test fails, bombadil prints both the `b
 3. Use `bombadil browser inspect ./bombadil-output` to step through what happened.
 
 For reproductions to succeed, run with the same options as the original (viewport, specification file, etc.).
+
+## Upgrading from v2
+
+`v2` pinned Bombadil 0.6.0; `v3` runs 0.7.x. The action's own inputs are backwards compatible — nothing was renamed or removed — but two things are worth knowing:
+
+- `output-path-overwrite` used to apply only to the terminal driver. It now applies to both, since 0.7 added the flag to `bombadil browser test`.
+- Bombadil 0.7.0 made **breaking changes to the specification language**. Action generators now return `ActionTemplate` values that declare the ranges of random values instead of drawing randomness in JS/TS, and some browser actions need a `Fingerprint` (from `getFingerprint`, exported by `@antithesishq/bombadil/browser`). If you pass a custom `specification`, migrate it before moving to `v3` (see the [0.7.0 release notes](https://github.com/antithesishq/bombadil/releases/tag/v0.7.0)). Specifications that only re-export the defaults need no changes.
+
+To stay on 0.6.x, keep using `@v2`.
 
 ## Development
 
